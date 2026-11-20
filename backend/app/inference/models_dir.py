@@ -10,13 +10,8 @@ from __future__ import annotations
 from app import config
 
 # Preset 모델 — UI 토글 + worker 자동 다운로드 기본값. 신뢰경계: ultralytics 공식 가중치만.
-PRESET_MODELS: tuple[str, ...] = (
-    "yolo26n-seg.pt",
-    "yolo26s-seg.pt",
-    "yolo26m-seg.pt",
-    "yolo26l-seg.pt",
-    "yolo26x-seg.pt",
-)
+# 목록 정본은 config.PRESET_MODELS (YOLO_DEFAULT_MODEL 검사에도 쓴다).
+PRESET_MODELS: tuple[str, ...] = config.PRESET_MODELS
 
 # 허용된 YOLO26 seg preset은 모두 COCO 80-class 모델이다. 클래스 설정 UI가
 # 가중치를 다운로드하지 않도록 정적 메타데이터를 별도로 보관한다.

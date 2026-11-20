@@ -73,3 +73,10 @@ def test_absolute_weights_directory_is_used_as_configured(monkeypatch, tmp_path)
 def test_weights_directory_only_accepts_preset_names(name):
     with pytest.raises(ValueError):
         resolve_model_path(name)
+
+
+def test_yolo_default_model_outside_presets_falls_back(monkeypatch):
+    """목록 밖 · 빈 YOLO_DEFAULT_MODEL 은 기본 모델로 — 그대로 쓰면 기본 lane 이 로드 실패로 추론이 조용히 멈춘다."""
+    assert _reload_config(monkeypatch, YOLO_DEFAULT_MODEL="nope.pt").YOLO_DEFAULT_MODEL == "yolo26n-seg.pt"
+    assert _reload_config(monkeypatch, YOLO_DEFAULT_MODEL="").YOLO_DEFAULT_MODEL == "yolo26n-seg.pt"
+    assert _reload_config(monkeypatch, YOLO_DEFAULT_MODEL="yolo26x-seg.pt").YOLO_DEFAULT_MODEL == "yolo26x-seg.pt"

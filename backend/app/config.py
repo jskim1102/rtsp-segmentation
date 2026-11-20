@@ -34,7 +34,17 @@ MEDIAMTX_WEBRTC_HOST: str = os.getenv("MEDIAMTX_WEBRTC_HOST", "")
 
 # ── detection (YOLO 추론 — deepeye-lite 차용) ──
 # 기본 모델 + conf. 워커(InferenceWorker)도 같은 env 를 직접 읽음(worker.py).
-YOLO_DEFAULT_MODEL: str = os.getenv("YOLO_DEFAULT_MODEL", "yolo26n-seg.pt")
+# 공식 가중치 목록 — models_dir.PRESET_MODELS 도 이것을 쓴다 (models_dir 가 config 를 import 해서 여기에 둔다).
+PRESET_MODELS: tuple[str, ...] = (
+    "yolo26n-seg.pt",
+    "yolo26s-seg.pt",
+    "yolo26m-seg.pt",
+    "yolo26l-seg.pt",
+    "yolo26x-seg.pt",
+)
+# 빈 값 · 목록 밖 값은 기본 모델로 — 목록 밖 이름이면 기본 lane 이 'Model load failed' 로 죽고 추론이 조용히 멈춘다.
+_raw_yolo_model = os.getenv("YOLO_DEFAULT_MODEL", "")
+YOLO_DEFAULT_MODEL: str = _raw_yolo_model if _raw_yolo_model in PRESET_MODELS else "yolo26n-seg.pt"
 YOLO_WEIGHTS_DIR = Path(__file__).resolve().parents[1] / (os.getenv("YOLO_WEIGHTS_DIR") or "models")
 
 
@@ -108,6 +118,8 @@ def setup_logging() -> logging.Logger:
 
 logger = setup_logging()
 
+if _raw_yolo_model and _raw_yolo_model != YOLO_DEFAULT_MODEL:
+    logger.warning("YOLO_DEFAULT_MODEL=%r 가 공식 모델 목록에 없어 %s 를 사용합니다", _raw_yolo_model, YOLO_DEFAULT_MODEL)
 if _raw_max_ipcams != MAX_IPCAMS:
     logger.warning("MAX_IPCAMS=%d → %d 로 보정됨 (허용 범위: 1~64)", _raw_max_ipcams, MAX_IPCAMS)
 for _w in (_conf_warn,):
