@@ -97,6 +97,9 @@ if ($asks.Count -gt 0) {
     Write-Host ''; Write-Host "  ? $($asks[$k])"
     if (($k.EndsWith('_HOST') -or $k.EndsWith('_IP')) -and $ips) { Write-Host "    참고 - 이 PC 의 IP: $ips" }
     $ans = "$(Read-Host '  ')".Trim()
+    if ($k -eq 'MEDIAMTX_WEBRTC_HOST') {
+      $ans = $ans -replace '\s*,\s*', ','
+    }
     if ($ans) { EnvSet $k $ans; Ok "$k=$ans" } else { Ok "$k 비워 둠" }
   }
 }
@@ -108,6 +111,8 @@ if ($LASTEXITCODE -ne 0) { Die '.env 파일의 설정을 확인한 뒤 다시 �
 
 Step 'MediaMTX와 추론 서버 준비'
 & docker compose pull --policy missing mediamtx
+# --policy 는 Compose 2.22 부터 — 그 전 버전은 이 옵션을 몰라 실패하므로 그때는 그냥 받는다
+if ($LASTEXITCODE -ne 0) { & docker compose pull mediamtx }
 if ($LASTEXITCODE -ne 0) { Die 'MediaMTX 이미지를 받지 못했어요. 인터넷 연결을 확인하세요.' }
 & docker compose pull backend
 if ($LASTEXITCODE -ne 0) {
