@@ -16,6 +16,7 @@ services:
     image: ghcr.io/jskim1102/rtsp-segmentation-backend:latest
     container_name: rtsp-segmentation-backend
     environment:
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
       # SQLite DB 를 named volume 으로 — config.py 기본 경로 대신 override (spec Decision).
       DATABASE_URL: sqlite:////app/data/ipcam.db
       # config.py 가 읽는 등록 cap. 비우면 config 기본 16.
